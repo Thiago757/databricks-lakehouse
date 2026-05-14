@@ -1,0 +1,1146 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Pipeline de dados com Arquitetura Medalhão no Databricks Free Edition">
+      
+      
+        <meta name="author" content="Guilherme & Thiago">
+      
+      
+      
+        <link rel="prev" href="../medallion/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Modelo Dimensional (Gold) - Trabalho 3 — Lakehouse Databricks</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#modelo-dimensional-ralph-kimball-gold" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Trabalho 3 — Lakehouse Databricks" class="md-header__button md-logo" aria-label="Trabalho 3 — Lakehouse Databricks" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Trabalho 3 — Lakehouse Databricks
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Modelo Dimensional (Gold)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../setup/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuração
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../medallion/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura Medalhão
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Modelo Dimensional (Gold)
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Trabalho 3 — Lakehouse Databricks" class="md-nav__button md-logo" aria-label="Trabalho 3 — Lakehouse Databricks" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Trabalho 3 — Lakehouse Databricks
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../medallion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura Medalhão
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modelo Dimensional (Gold)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modelo Dimensional (Gold)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#o-que-e-o-modelo-kimball" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O que é o Modelo Kimball?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="O que é o Modelo Kimball?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vantagens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vantagens
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#star-schema-do-segurodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Star Schema do SeguroDB
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dimensoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimensões
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dimensões">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dim_data-calendario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_data — Calendário
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_cliente-clientes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_cliente — Clientes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_veiculo-veiculos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_veiculo — Veículos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_localizacao-geografia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_localizacao — Geografia
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fatos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fatos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fatos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fato_apolice-apolices-de-seguro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fato_apolice — Apólices de Seguro
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fato_sinistro-sinistros-registrados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fato_sinistro — Sinistros Registrados
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemplos-de-queries-analiticas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplos de queries analíticas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemplos de queries analíticas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#total-de-cobertura-por-mes-e-ano" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total de cobertura por mês e ano
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sinistros-por-regiao-e-ano" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sinistros por região e ano
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apolices-por-perfil-de-cliente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Apólices por perfil de cliente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top-marcas-com-mais-sinistros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top marcas com mais sinistros
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="modelo-dimensional-ralph-kimball-gold">Modelo Dimensional — Ralph Kimball (Gold)</h1>
+<h2 id="o-que-e-o-modelo-kimball">O que é o Modelo Kimball?</h2>
+<p>A metodologia <strong>Ralph Kimball</strong> propõe organizar os dados em um <strong>modelo dimensional</strong>
+(star schema / snowflake), separando os dados em:</p>
+<ul>
+<li><strong>Dimensões:</strong> tabelas que descrevem o contexto de um evento (quem, onde, quando, o quê)</li>
+<li><strong>Fatos:</strong> tabelas que registram eventos de negócio com métricas numéricas</li>
+</ul>
+<h3 id="vantagens">Vantagens</h3>
+<ul>
+<li>Consultas analíticas mais simples e rápidas</li>
+<li>Estrutura intuitiva para analistas de negócio</li>
+<li>Compatível com ferramentas de BI (Power BI, Tableau, Metabase)</li>
+</ul>
+<hr />
+<h2 id="star-schema-do-segurodb">Star Schema do SeguroDB</h2>
+<pre><code>                    ┌──────────────┐
+                    │  dim_data    │
+                    │  (Calendário)│
+                    └──────┬───────┘
+                           │ sk_data_inicio / sk_data_fim
+          ┌────────────────┤
+          │                ▼
+┌─────────┴──────┐   ┌─────────────────┐   ┌────────────────┐
+│  dim_cliente   │   │  fato_apolice   │   │  dim_veiculo   │
+│  (Clientes)    ├───┤  (por apólice)  ├───┤  (Veículos)    │
+└────────────────┘   └─────────────────┘   └────────────────┘
+
+
+                    ┌──────────────┐
+                    │  dim_data    │
+                    └──────┬───────┘
+                           │ sk_data_sinistro
+          ┌────────────────┤
+          │                ▼
+┌─────────┴──────┐   ┌─────────────────┐   ┌────────────────────┐
+│  dim_veiculo   │   │  fato_sinistro  │   │  dim_localizacao   │
+│  (Veículos)    ├───┤  (por sinistro) ├───┤  (Geografia)       │
+└────────────────┘   └─────────────────┘   └────────────────────┘
+</code></pre>
+<hr />
+<h2 id="dimensoes">Dimensões</h2>
+<h3 id="dim_data-calendario">dim_data — Calendário</h3>
+<p>Gerada automaticamente a partir das datas presentes nos fatos.
+<code>sk_data</code> é um inteiro no formato <strong>YYYYMMDD</strong> (ex: 20240315).</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sk_data</code></td>
+<td>INT (PK)</td>
+<td>Chave surrogate: YYYYMMDD</td>
+</tr>
+<tr>
+<td><code>dt_data</code></td>
+<td>DATE</td>
+<td>Data completa</td>
+</tr>
+<tr>
+<td><code>nr_ano</code></td>
+<td>INT</td>
+<td>Ano (ex: 2024)</td>
+</tr>
+<tr>
+<td><code>nr_mes</code></td>
+<td>INT</td>
+<td>Mês numérico (1-12)</td>
+</tr>
+<tr>
+<td><code>nr_dia</code></td>
+<td>INT</td>
+<td>Dia do mês (1-31)</td>
+</tr>
+<tr>
+<td><code>nm_mes</code></td>
+<td>STRING</td>
+<td>Nome do mês (Janeiro, Fevereiro...)</td>
+</tr>
+<tr>
+<td><code>nm_dia_semana</code></td>
+<td>STRING</td>
+<td>Dia da semana (Segunda, Terça...)</td>
+</tr>
+<tr>
+<td><code>nr_trimestre</code></td>
+<td>INT</td>
+<td>Trimestre (1-4)</td>
+</tr>
+<tr>
+<td><code>is_fim_semana</code></td>
+<td>BOOLEAN</td>
+<td>True se sábado ou domingo</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="dim_cliente-clientes">dim_cliente — Clientes</h3>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sk_cliente</code></td>
+<td>INT (PK)</td>
+<td>Chave surrogate (= cd_cliente)</td>
+</tr>
+<tr>
+<td><code>cd_cliente</code></td>
+<td>INT</td>
+<td>Código original</td>
+</tr>
+<tr>
+<td><code>nome</code></td>
+<td>STRING</td>
+<td>Nome completo</td>
+</tr>
+<tr>
+<td><code>cpf</code></td>
+<td>STRING</td>
+<td>CPF (11 dígitos)</td>
+</tr>
+<tr>
+<td><code>sexo</code></td>
+<td>STRING</td>
+<td>M ou F</td>
+</tr>
+<tr>
+<td><code>dt_nascimento</code></td>
+<td>DATE</td>
+<td>Data de nascimento</td>
+</tr>
+<tr>
+<td><code>nr_idade</code></td>
+<td>INT</td>
+<td>Idade em anos (calculada)</td>
+</tr>
+<tr>
+<td><code>faixa_etaria</code></td>
+<td>STRING</td>
+<td>Menor de 18 / 18-30 / 31-45 / 46-60 / Acima de 60</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="dim_veiculo-veiculos">dim_veiculo — Veículos</h3>
+<p>Join de <code>carro</code> + <code>modelo</code> + <code>marca</code> da camada Silver.</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sk_veiculo</code></td>
+<td>INT (PK)</td>
+<td>Chave surrogate (row_number)</td>
+</tr>
+<tr>
+<td><code>placa</code></td>
+<td>STRING</td>
+<td>Placa do veículo</td>
+</tr>
+<tr>
+<td><code>chassi</code></td>
+<td>STRING</td>
+<td>Número do chassi</td>
+</tr>
+<tr>
+<td><code>ano_fabricacao</code></td>
+<td>INT</td>
+<td>Ano de fabricação</td>
+</tr>
+<tr>
+<td><code>cor</code></td>
+<td>STRING</td>
+<td>Cor do veículo</td>
+</tr>
+<tr>
+<td><code>cd_modelo</code></td>
+<td>INT</td>
+<td>Código do modelo</td>
+</tr>
+<tr>
+<td><code>nm_modelo</code></td>
+<td>STRING</td>
+<td>Nome do modelo</td>
+</tr>
+<tr>
+<td><code>cd_marca</code></td>
+<td>INT</td>
+<td>Código da marca</td>
+</tr>
+<tr>
+<td><code>nm_marca</code></td>
+<td>STRING</td>
+<td>Nome da marca</td>
+</tr>
+<tr>
+<td><code>faixa_ano</code></td>
+<td>STRING</td>
+<td>Antes de 2000 / 2000-2010 / 2011-2020 / 2021 em diante</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="dim_localizacao-geografia">dim_localizacao — Geografia</h3>
+<p>Join de <code>municipio</code> + <code>estado</code> + <code>regiao</code> da camada Silver.</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sk_localizacao</code></td>
+<td>INT (PK)</td>
+<td>Chave surrogate (= cd_municipio)</td>
+</tr>
+<tr>
+<td><code>cd_municipio</code></td>
+<td>INT</td>
+<td>Código do município (IBGE)</td>
+</tr>
+<tr>
+<td><code>nm_municipio</code></td>
+<td>STRING</td>
+<td>Nome do município</td>
+</tr>
+<tr>
+<td><code>cd_estado</code></td>
+<td>INT</td>
+<td>Código do estado</td>
+</tr>
+<tr>
+<td><code>nm_estado</code></td>
+<td>STRING</td>
+<td>Nome do estado</td>
+</tr>
+<tr>
+<td><code>sigla_uf</code></td>
+<td>STRING</td>
+<td>Sigla UF (ex: SP, RJ)</td>
+</tr>
+<tr>
+<td><code>cd_regiao</code></td>
+<td>INT</td>
+<td>Código da região</td>
+</tr>
+<tr>
+<td><code>nm_regiao</code></td>
+<td>STRING</td>
+<td>Nome da região (Norte, Sul...)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="fatos">Fatos</h2>
+<h3 id="fato_apolice-apolices-de-seguro">fato_apolice — Apólices de Seguro</h3>
+<p><strong>Grão:</strong> uma linha por apólice de seguro.</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sk_apolice</code></td>
+<td>INT (PK)</td>
+<td>Chave surrogate (= cd_apolice)</td>
+</tr>
+<tr>
+<td><code>cd_apolice</code></td>
+<td>INT</td>
+<td>Código da apólice (dim degenerada)</td>
+</tr>
+<tr>
+<td><code>sk_cliente</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_cliente</td>
+</tr>
+<tr>
+<td><code>sk_veiculo</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_veiculo</td>
+</tr>
+<tr>
+<td><code>sk_data_inicio</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_data (início da vigência)</td>
+</tr>
+<tr>
+<td><code>sk_data_fim</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_data (fim da vigência)</td>
+</tr>
+<tr>
+<td><code>vl_cobertura</code></td>
+<td>DECIMAL(15,2)</td>
+<td>Valor de cobertura (R$)</td>
+</tr>
+<tr>
+<td><code>vl_franquia</code></td>
+<td>DECIMAL(15,2)</td>
+<td>Valor da franquia (R$)</td>
+</tr>
+<tr>
+<td><code>dias_vigencia</code></td>
+<td>INT</td>
+<td>Duração da apólice em dias</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="fato_sinistro-sinistros-registrados">fato_sinistro — Sinistros Registrados</h3>
+<p><strong>Grão:</strong> uma linha por sinistro.</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sk_sinistro</code></td>
+<td>INT (PK)</td>
+<td>Chave surrogate (= cd_sinistro)</td>
+</tr>
+<tr>
+<td><code>cd_sinistro</code></td>
+<td>INT</td>
+<td>Código do sinistro (dim degenerada)</td>
+</tr>
+<tr>
+<td><code>sk_veiculo</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_veiculo</td>
+</tr>
+<tr>
+<td><code>sk_data_sinistro</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_data</td>
+</tr>
+<tr>
+<td><code>sk_localizacao</code></td>
+<td>INT (FK)</td>
+<td>Referência à dim_localizacao</td>
+</tr>
+<tr>
+<td><code>condutor</code></td>
+<td>STRING</td>
+<td>Nome do condutor (dim degenerada)</td>
+</tr>
+<tr>
+<td><code>qt_sinistros</code></td>
+<td>INT</td>
+<td>Quantidade (sempre = 1, para soma)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="exemplos-de-queries-analiticas">Exemplos de queries analíticas</h2>
+<h3 id="total-de-cobertura-por-mes-e-ano">Total de cobertura por mês e ano</h3>
+<pre><code class="language-sql">SELECT
+    d.nr_ano,
+    d.nm_mes,
+    COUNT(fa.sk_apolice)   AS qt_apolices,
+    SUM(fa.vl_cobertura)   AS total_cobertura,
+    AVG(fa.vl_franquia)    AS media_franquia
+FROM gold.fato_apolice fa
+JOIN gold.dim_data d ON fa.sk_data_inicio = d.sk_data
+GROUP BY d.nr_ano, d.nm_mes, d.nr_mes
+ORDER BY d.nr_ano, d.nr_mes;
+</code></pre>
+<h3 id="sinistros-por-regiao-e-ano">Sinistros por região e ano</h3>
+<pre><code class="language-sql">SELECT
+    l.nm_regiao,
+    d.nr_ano,
+    SUM(fs.qt_sinistros) AS total_sinistros
+FROM gold.fato_sinistro fs
+JOIN gold.dim_localizacao l ON fs.sk_localizacao = l.sk_localizacao
+JOIN gold.dim_data d ON fs.sk_data_sinistro = d.sk_data
+GROUP BY l.nm_regiao, d.nr_ano
+ORDER BY d.nr_ano, total_sinistros DESC;
+</code></pre>
+<h3 id="apolices-por-perfil-de-cliente">Apólices por perfil de cliente</h3>
+<pre><code class="language-sql">SELECT
+    c.faixa_etaria,
+    c.sexo,
+    COUNT(fa.sk_apolice)   AS qt_apolices,
+    AVG(fa.vl_cobertura)   AS media_cobertura
+FROM gold.fato_apolice fa
+JOIN gold.dim_cliente c ON fa.sk_cliente = c.sk_cliente
+GROUP BY c.faixa_etaria, c.sexo
+ORDER BY c.faixa_etaria;
+</code></pre>
+<h3 id="top-marcas-com-mais-sinistros">Top marcas com mais sinistros</h3>
+<pre><code class="language-sql">SELECT
+    v.nm_marca,
+    COUNT(fs.sk_sinistro) AS qt_sinistros
+FROM gold.fato_sinistro fs
+JOIN gold.dim_veiculo v ON fs.sk_veiculo = v.sk_veiculo
+GROUP BY v.nm_marca
+ORDER BY qt_sinistros DESC
+LIMIT 10;
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1051 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Pipeline de dados com Arquitetura Medalhão no Databricks Free Edition">
+      
+      
+        <meta name="author" content="Guilherme & Thiago">
+      
+      
+      
+        <link rel="prev" href="../setup/">
+      
+      
+        <link rel="next" href="../gold_kimball/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Arquitetura Medalhão - Trabalho 3 — Lakehouse Databricks</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#arquitetura-medalhao" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Trabalho 3 — Lakehouse Databricks" class="md-header__button md-logo" aria-label="Trabalho 3 — Lakehouse Databricks" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Trabalho 3 — Lakehouse Databricks
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Arquitetura Medalhão
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../setup/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuração
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura Medalhão
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../gold_kimball/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Modelo Dimensional (Gold)
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Trabalho 3 — Lakehouse Databricks" class="md-nav__button md-logo" aria-label="Trabalho 3 — Lakehouse Databricks" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Trabalho 3 — Lakehouse Databricks
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura Medalhão
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura Medalhão
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#o-que-e-a-arquitetura-medalhao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O que é a Arquitetura Medalhão?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-landing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada LANDING
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada LANDING">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objetivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tabelas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabelas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#por-que-csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por que CSV?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-bronze" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada BRONZE
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada BRONZE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objetivo_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementacao_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beneficios-do-delta-lake-no-bronze" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefícios do Delta Lake no Bronze
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo-transaction-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo — Transaction Log
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-silver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada SILVER
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada SILVER">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objetivo_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regras-de-data-quality-aplicadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regras de Data Quality aplicadas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Regras de Data Quality aplicadas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#genericas-todas-as-tabelas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Genéricas (todas as tabelas)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#especificas-por-tabela" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Específicas por tabela
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformacoes-de-tipo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformações de tipo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#colunas-derivadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Colunas derivadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relatorio-de-data-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relatório de Data Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-gold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada GOLD
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada GOLD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objetivo_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tabelas-criadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabelas criadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparacao-entre-camadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparação entre camadas
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gold_kimball/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modelo Dimensional (Gold)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="arquitetura-medalhao">Arquitetura Medalhão</h1>
+<h2 id="o-que-e-a-arquitetura-medalhao">O que é a Arquitetura Medalhão?</h2>
+<p>A <strong>Arquitetura Medalhão</strong> (Medallion Architecture) é um padrão de organização de dados em
+camadas para Lakehouses, onde cada camada representa um nível crescente de qualidade e
+refinamento dos dados:</p>
+<pre><code>BRUTO ──────────────────────────────────────────────► ANALÍTICO
+LANDING → BRONZE → SILVER → GOLD
+</code></pre>
+<hr />
+<h2 id="camada-landing">Camada LANDING</h2>
+<p><strong>Notebook:</strong> <code>01_landing.py</code></p>
+<h3 id="objetivo">Objetivo</h3>
+<p>Extrair os dados brutos da origem (Supabase PostgreSQL) e armazená-los no Databricks
+exatamente como vieram, sem nenhuma transformação.</p>
+<h3 id="implementacao">Implementação</h3>
+<ul>
+<li>Conexão via <strong>JDBC PostgreSQL</strong> (driver nativo no Databricks)</li>
+<li>Lê cada tabela com <code>spark.read.jdbc()</code></li>
+<li>Salva como <strong>CSV</strong> em <code>dbfs:/FileStore/tables/landing/{tabela}/</code></li>
+<li>Registra <strong>external tables</strong> no schema <code>landing</code> do Databricks</li>
+<li>Validação: contagem de registros deve ser igual à do Supabase</li>
+</ul>
+<h3 id="tabelas">Tabelas</h3>
+<pre><code>landing.regiao, landing.estado, landing.municipio, landing.marca, landing.modelo,
+landing.cliente, landing.endereco, landing.telefone, landing.carro,
+landing.apolice, landing.sinistro
+</code></pre>
+<h3 id="por-que-csv">Por que CSV?</h3>
+<p>O CSV é o formato de troca universal. Permite que a origem seja qualquer sistema
+(banco relacional, APIs, arquivos) sem dependência de formato específico.</p>
+<hr />
+<h2 id="camada-bronze">Camada BRONZE</h2>
+<p><strong>Notebook:</strong> <code>02_bronze.py</code></p>
+<h3 id="objetivo_1">Objetivo</h3>
+<p>Ler os arquivos CSV da camada Landing e converter para <strong>Delta Lake</strong>, habilitando
+transações ACID, versionamento e time travel.</p>
+<h3 id="implementacao_1">Implementação</h3>
+<ul>
+<li>Lê do schema <code>landing</code> (external tables CSV)</li>
+<li>Converte para <strong>managed Delta tables</strong> no schema <code>bronze</code></li>
+<li>Modo <code>overwrite</code> para re-execuções idempotentes</li>
+<li>Valida com <code>DESCRIBE HISTORY</code> (transaction log)</li>
+</ul>
+<h3 id="beneficios-do-delta-lake-no-bronze">Benefícios do Delta Lake no Bronze</h3>
+<table>
+<thead>
+<tr>
+<th>Benefício</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ACID</strong></td>
+<td>Leituras e escritas atômicas e consistentes</td>
+</tr>
+<tr>
+<td><strong>Time Travel</strong></td>
+<td>Leitura de versões anteriores da tabela</td>
+</tr>
+<tr>
+<td><strong>Transaction Log</strong></td>
+<td>Auditoria completa de todas as operações</td>
+</tr>
+<tr>
+<td><strong>Schema Evolution</strong></td>
+<td>Alterações de schema sem recriar tabelas</td>
+</tr>
+</tbody>
+</table>
+<h3 id="exemplo-transaction-log">Exemplo — Transaction Log</h3>
+<pre><code class="language-sql">DESCRIBE HISTORY bronze.apolice;
+-- version | timestamp | operation | operationMetrics
+-- 0       | 2025-...  | WRITE     | numFiles=1, numRows=10000
+</code></pre>
+<hr />
+<h2 id="camada-silver">Camada SILVER</h2>
+<p><strong>Notebook:</strong> <code>03_silver.py</code></p>
+<h3 id="objetivo_2">Objetivo</h3>
+<p>Aplicar regras de <strong>Data Quality</strong> sobre os dados Bronze, garantindo que apenas dados
+válidos, tipados e sem duplicatas cheguem para as análises.</p>
+<h3 id="regras-de-data-quality-aplicadas">Regras de Data Quality aplicadas</h3>
+<h4 id="genericas-todas-as-tabelas">Genéricas (todas as tabelas)</h4>
+<ul>
+<li><code>dropDuplicates()</code> — remove linhas exatamente iguais</li>
+<li><code>dropna(subset=[pk])</code> — remove linhas com PK nula</li>
+</ul>
+<h4 id="especificas-por-tabela">Específicas por tabela</h4>
+<table>
+<thead>
+<tr>
+<th>Tabela</th>
+<th>Regras</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cliente</code></td>
+<td>cpf com 11 dígitos, sexo in ('M','F'), dt_nascimento ≤ hoje</td>
+</tr>
+<tr>
+<td><code>estado</code></td>
+<td>sigla_uf com exatamente 2 caracteres</td>
+</tr>
+<tr>
+<td><code>carro</code></td>
+<td>ano entre 1900 e ano atual</td>
+</tr>
+<tr>
+<td><code>endereco</code></td>
+<td>nr_endereco &gt; 0</td>
+</tr>
+<tr>
+<td><code>telefone</code></td>
+<td>nr_telefone com ≥ 8 dígitos</td>
+</tr>
+<tr>
+<td><code>apolice</code></td>
+<td>vl_cobertura &gt; 0, vl_franquia ≥ 0, dt_fim &gt; dt_inicio</td>
+</tr>
+<tr>
+<td><code>sinistro</code></td>
+<td>dt_sinistro não pode ser data futura</td>
+</tr>
+</tbody>
+</table>
+<h4 id="transformacoes-de-tipo">Transformações de tipo</h4>
+<pre><code class="language-python">.withColumn(&quot;dt_nascimento&quot;,    F.col(&quot;dt_nascimento&quot;).cast(DateType()))
+.withColumn(&quot;dt_inicio_vigencia&quot;, F.col(&quot;dt_inicio_vigencia&quot;).cast(TimestampType()))
+.withColumn(&quot;vl_cobertura&quot;,     F.col(&quot;vl_cobertura&quot;).cast(DecimalType(15, 2)))
+.withColumn(&quot;placa&quot;,            F.trim(F.col(&quot;placa&quot;)))  # remove espaços
+</code></pre>
+<h4 id="colunas-derivadas">Colunas derivadas</h4>
+<table>
+<thead>
+<tr>
+<th>Tabela</th>
+<th>Coluna</th>
+<th>Fórmula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cliente</code></td>
+<td><code>nr_idade</code></td>
+<td><code>datediff(today, dt_nascimento) / 365.25</code></td>
+</tr>
+<tr>
+<td><code>cliente</code></td>
+<td><code>faixa_etaria</code></td>
+<td>Menor de 18 / 18-30 / 31-45 / 46-60 / Acima de 60</td>
+</tr>
+<tr>
+<td><code>carro</code></td>
+<td><code>faixa_ano</code></td>
+<td>Antes de 2000 / 2000-2010 / 2011-2020 / 2021 em diante</td>
+</tr>
+<tr>
+<td><code>apolice</code></td>
+<td><code>dias_vigencia</code></td>
+<td><code>datediff(dt_fim, dt_inicio)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="relatorio-de-data-quality">Relatório de Data Quality</h3>
+<p>O notebook gera um relatório consolidado comparando contagens Bronze × Silver:</p>
+<pre><code>======================================================
+RELATÓRIO CONSOLIDADO — DATA QUALITY
+Tabela         Bronze   Silver  Removidos    % DQ
+------------------------------------------------------
+  cliente       20010    19987        23      0.1%
+  apolice       10000     9998         2      0.0%
+  sinistro      10000    10000         0      0.0%
+  ...
+</code></pre>
+<hr />
+<h2 id="camada-gold">Camada GOLD</h2>
+<p><strong>Notebook:</strong> <code>04_gold.py</code></p>
+<h3 id="objetivo_3">Objetivo</h3>
+<p>Modelar os dados Silver segundo a metodologia <strong>Ralph Kimball</strong> (modelo dimensional),
+criando dimensões e tabelas fato prontas para análise e BI.</p>
+<blockquote>
+<p>Detalhamento completo em <a href="../gold_kimball/">Modelo Dimensional (Gold)</a>.</p>
+</blockquote>
+<h3 id="tabelas-criadas">Tabelas criadas</h3>
+<pre><code>gold.dim_data           gold.fato_apolice
+gold.dim_cliente        gold.fato_sinistro
+gold.dim_veiculo
+gold.dim_localizacao
+</code></pre>
+<hr />
+<h2 id="comparacao-entre-camadas">Comparação entre camadas</h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Landing</th>
+<th>Bronze</th>
+<th>Silver</th>
+<th>Gold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Formato</strong></td>
+<td>CSV</td>
+<td>Delta</td>
+<td>Delta</td>
+<td>Delta</td>
+</tr>
+<tr>
+<td><strong>Qualidade</strong></td>
+<td>Bruto</td>
+<td>Bruto</td>
+<td>Tratado</td>
+<td>Modelado</td>
+</tr>
+<tr>
+<td><strong>Tipos</strong></td>
+<td>String (inferidos)</td>
+<td>Inferidos</td>
+<td>Corretos</td>
+<td>Corretos</td>
+</tr>
+<tr>
+<td><strong>Duplicatas</strong></td>
+<td>Possível</td>
+<td>Possível</td>
+<td>Removidas</td>
+<td>Removidas</td>
+</tr>
+<tr>
+<td><strong>Uso</strong></td>
+<td>Ingestão</td>
+<td>Auditoria</td>
+<td>Análise</td>
+<td>BI / Relatórios</td>
+</tr>
+<tr>
+<td><strong>Schema</strong></td>
+<td>External</td>
+<td>Managed</td>
+<td>Managed</td>
+<td>Managed</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
