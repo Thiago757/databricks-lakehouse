@@ -170,3 +170,29 @@ mkdocs serve
 - **Ralph Kimball** — Metodologia de modelagem dimensional (Gold)
 - **Jobs & Pipelines** — Orquestração sequencial no Databricks Workflows
 - **MkDocs Material** — Documentação do projeto
+
+## Referências
+
+### Documentações Oficiais
+
+| Tecnologia | Link |
+|---|---|
+| Databricks Free Edition | [docs.databricks.com](https://docs.databricks.com) |
+| Delta Lake | [docs.delta.io](https://docs.delta.io) |
+| Apache Spark | [spark.apache.org/docs/latest](https://spark.apache.org/docs/latest) |
+| Supabase | [supabase.com/docs](https://supabase.com/docs) |
+| MkDocs Material | [squidfunk.github.io/mkdocs-material](https://squidfunk.github.io/mkdocs-material) |
+
+### Referências Bibliográficas (ABNT)
+
+KIMBALL, Ralph; ROSS, Margy. **The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling**. 3. ed. Indianapolis: John Wiley & Sons, 2013.
+
+DATABRICKS. **Databricks Documentation**. Disponível em: <https://docs.databricks.com>. Acesso em: 14 maio 2026.
+
+DELTA LAKE. **Delta Lake Documentation**. Disponível em: <https://docs.delta.io>. Acesso em: 14 maio 2026.
+
+APACHE SOFTWARE FOUNDATION. **Apache Spark Documentation**. Disponível em: <https://spark.apache.org/docs/latest>. Acesso em: 14 maio 2026.
+
+SUPABASE. **Supabase Documentation**. Disponível em: <https://supabase.com/docs>. Acesso em: 14 maio 2026.
+
+SQUIDFUNK. **MkDocs Material Documentation**. Disponível em: <https://squidfunk.github.io/mkdocs-material>. Acesso em: 14 maio 2026.
