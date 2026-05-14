@@ -1,0 +1,19 @@
+site_name: "Trabalho 3 — Lakehouse Databricks"
+site_description: "Pipeline de dados com Arquitetura Medalhão no Databricks Free Edition"
+site_author: "Guilherme & Thiago"
+
+theme:
+  name: material
+  palette:
+    primary: green
+    accent: orange
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+
+nav:
+  - Início: index.md
+  - Configuração: setup.md
+  - Arquitetura Medalhão: medallion.md
+  - Modelo Dimensional (Gold): gold_kimball.md

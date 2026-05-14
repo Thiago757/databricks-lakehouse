@@ -1,0 +1,26 @@
+# Ambiente Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Dados sensíveis
+*.env.local
+
+# Databricks — artefatos locais
+*.dbc
+.databricks/
+
+# MkDocs
+site/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
